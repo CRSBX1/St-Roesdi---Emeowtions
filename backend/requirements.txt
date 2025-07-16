@@ -1,0 +1,13 @@
+json
+numpy
+datetime
+joblib
+pickle
+flask
+flask_cors
+os
+uuid
+librosa
+tensorflow
+tensorflow_hub
+google.generativeai
