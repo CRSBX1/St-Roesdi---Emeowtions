@@ -3,7 +3,7 @@ import numpy as np
 from datetime import datetime
 import joblib
 import pickle
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory, render_template
 from flask_cors import CORS #Enables communication between react frontend and this backend
 import os #for directory stuff
 import uuid #to add unique names to added files
@@ -304,3 +304,11 @@ if __name__ == '__main__':
     # When running locally, Flask runs on http://127.0.0.1:5000 by default
     # debug=True allows for automatic reloading on code changes and provides debug info
     app.run(debug=True, port=5000)
+
+@app.route('/')
+def index():
+    return render_template('index.html')  # Serves the frontend entry page
+
+@app.route('/<path:path>')
+def static_proxy(path):
+    return send_from_directory('static', path)  # Serve static assets
