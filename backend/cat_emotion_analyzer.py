@@ -17,7 +17,7 @@ app = Flask("Emeowtions_analyzer")
 CORS(app)
 Model_path = 'cat_emotion_model.pkl'
 
-GEMINI_API_KEY = "YOUR_GEMINI_API_KEY_HERE" # <<< IMPORTANT: Replace with your actual key
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")# <<< IMPORTANT: Replace with your actual key
 genai.configure(api_key=GEMINI_API_KEY)
 gemini_model = genai.GenerativeModel('gemini-pro')
 
