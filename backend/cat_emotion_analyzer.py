@@ -300,11 +300,6 @@ def analyze_emotion():
 
     return jsonify({"error": "Something went wrong with the file upload"}), 500
 
-if __name__ == '__main__':
-    # When running locally, Flask runs on http://127.0.0.1:5000 by default
-    # debug=True allows for automatic reloading on code changes and provides debug info
-    app.run(debug=True, port=5000)
-
 @app.route('/')
 def index():
     return render_template('index.html')  # Serves the frontend entry page
@@ -312,3 +307,9 @@ def index():
 @app.route('/<path:path>')
 def static_proxy(path):
     return send_from_directory('static', path)  # Serve static assets
+
+if __name__ == '__main__':
+    # When running locally, Flask runs on http://127.0.0.1:5000 by default
+    # debug=True allows for automatic reloading on code changes and provides debug info
+    app.run(debug=True, port=5000)
+
