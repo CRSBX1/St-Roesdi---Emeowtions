@@ -1,0 +1,19 @@
+# Ignore environment and log files
+.env
+*.log
+
+# Ignore audio, video, and model files
+*.wav
+*.mp3
+*.mp4
+*.avi
+*.pkl
+*.h5
+*.pt
+
+# Ignore temporary or OS files
+__pycache__/
+node_modules/
+.DS_Store
+*.tmp
+*.cache
