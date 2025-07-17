@@ -15,10 +15,10 @@ import subprocess
 import tempfile
 
 yamnet_model = hub.load('https://tfhub.dev/google/yamnet/1')
-app = Flask("Emeowtions_analyzer")
-CORS(app)
 base_dir = os.path.dirname(os.path.abspath(__file__))
 model_path = os.path.join(base_dir, 'cat_emotion_model.pkl')
+app = Flask("Emeowtions_analyzer", template_folder=os.path.join(base_dir, "templates"))
+CORS(app)
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")# <<< IMPORTANT: Replace with your actual key
 genai.configure(api_key=GEMINI_API_KEY)
@@ -337,9 +337,6 @@ def chat_with_gemini():
     except Exception as e:
         print(f"Gemini chat error: {e}")
         return jsonify({"error": "Internal server error"}), 500
-
-base_dir = os.path.dirname(os.path.abspath(__file__))
-app = Flask("Emeowtions_analyzer", template_folder=os.path.join(base_dir, "templates"))  # Serves the frontend entry page
 
 @app.route('/')
 def index():
