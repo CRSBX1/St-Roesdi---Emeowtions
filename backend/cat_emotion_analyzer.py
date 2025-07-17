@@ -17,7 +17,8 @@ import tempfile
 yamnet_model = hub.load('https://tfhub.dev/google/yamnet/1')
 app = Flask("Emeowtions_analyzer")
 CORS(app)
-Model_path = 'cat_emotion_model.pkl'
+base_dir = os.path.dirname(os.path.abspath(__file__))
+model_path = os.path.join(base_dir, 'cat_emotion_model.pkl')
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")# <<< IMPORTANT: Replace with your actual key
 genai.configure(api_key=GEMINI_API_KEY)
