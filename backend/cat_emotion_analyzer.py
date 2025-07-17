@@ -348,5 +348,6 @@ def static_proxy(path):
 if __name__ == '__main__':
     # When running locally, Flask runs on http://127.0.0.1:5000 by default
     # debug=True allows for automatic reloading on code changes and provides debug info
-    app.run(debug=True, port=5000, use_reloader=False)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000))) #for deploy environment
+    #app.run(debug=True, port=5000, use_reloader=False) for local use
 
