@@ -340,7 +340,7 @@ def chat_with_gemini():
 
 @app.route('/')
 def index():
-    return render_template('index.html')  # Serves the frontend entry page
+    return render_template('index.html', template_folder=os.path.join(base_dir, "templates"))  # Serves the frontend entry page
 
 @app.route('/<path:path>')
 def static_proxy(path):
