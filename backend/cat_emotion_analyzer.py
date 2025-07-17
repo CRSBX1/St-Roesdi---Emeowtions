@@ -11,6 +11,8 @@ import librosa
 import tensorflow as tf
 import tensorflow_hub as hub
 import google.generativeai as genai
+import subprocess
+import tempfile
 
 yamnet_model = hub.load('https://tfhub.dev/google/yamnet/1')
 app = Flask("Emeowtions_analyzer")
@@ -18,8 +20,8 @@ CORS(app)
 Model_path = 'cat_emotion_model.pkl'
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")# <<< IMPORTANT: Replace with your actual key
-genai.configure(api_key=GEMINI_API_KEY)
-gemini_model = genai.GenerativeModel('gemini-pro')
+genai.configure(api_key="AIzaSyAsza2Ba5lIlkZiA6Fc3BrIukQmh8rOYPU")
+gemini_model = genai.GenerativeModel('gemini-2.5-flash')
 
 class CatEmotionAnalyzer:
     def __init__(self):
@@ -216,34 +218,36 @@ def analyze_emotion():
 
         try:
             file.save(temp_filepath)
-            #print(f"File saved temporarily to: {temp_filepath}")
-            processed_input_data = None
+            print(f"File saved temporarily to: {temp_filepath}")
             if file_type == 'audio':
                 audio = load_audio(temp_filepath)
                 embedding = extract_yamnet_embeddings(audio)
                 embedding = np.array(embedding)
             elif file_type == 'video':
-                print("Processing video file...")
-                # Example for OpenCV (assuming you installed it):
-                # cap = cv2.VideoCapture(temp_filepath)
-                # frames = []
-                # while True:
-                #     ret, frame = cap.read()
-                #     if not ret: break
-                #     frames.append(cv2.resize(frame, (64, 64)).flatten()) # Resize and flatten frames
-                # cap.release()
-                # processed_input_data = np.array(frames)
-                # # You might need to average features across frames or select keyframes
+                print("Extracting audio from video...")
+                # Use tempfile for intermediate audio path
+                audio_temp = tempfile.NamedTemporaryFile(suffix=".wav", delete=False)
+                audio_path = audio_temp.name
+                audio_temp.close()
 
-                # Placeholder: Replace with your actual video pre-processing logic
-                processed_input_data = np.random.rand(1, 200) # Dummy 1x200 feature vector
-                print("Video pre-processing completed (dummy).")
+                # Run ffmpeg to extract audio as WAV
+                try:
+                    subprocess.run([
+                        'ffmpeg', '-y', '-i', temp_filepath,
+                        '-vn', '-acodec', 'pcm_s16le',
+                        '-ar', '16000', '-ac', '1',
+                        audio_path
+                    ], check=True)
 
+                    audio = load_audio(audio_path)
+                    embedding = extract_yamnet_embeddings(audio)
+                    embedding = np.array(embedding)
+
+                    os.remove(audio_path)  # Clean up
+                except subprocess.CalledProcessError as e:
+                    return jsonify({"error": f"Failed to extract audio: {str(e)}"}), 500
             else:
                 return jsonify({"error": "Unsupported file type specified."}), 400
-
-            if processed_input_data is None:
-                return jsonify({"error": "Failed to pre-process file."}), 500
 
             # --- 3. Make a prediction using your loaded .pkl model ---
             print("Making prediction with the model...")
@@ -264,7 +268,7 @@ def analyze_emotion():
                 f"You are an AI assistant specialized in cat behavior and emotions. "
                 f"A user has just uploaded an audio/video for their cat, {pet_name} ({pet_breed}), age {pet_age}. {pet_name} is described as{pet_description}"
                 f"The emotion analysis model has determined the primary emotion is '{final_analysis_result['emotions']['primary']}' "
-                f"with a confidence of {final_analysis_result['emotions']['confidence']:.2f}%. "
+                f"with an accuracy estimation of {final_analysis_result['emotions']['confidence']:.2f}%. "
                 f"The recommendation is: '{final_analysis_result['analysis_details']['top_emotions'][0]['emotion']}'. " # Using primary emotion's recommendation
                 f"Based on this analysis, provide a helpful and welcoming initial message to the user. "
                 f"Encourage them to ask further questions about {pet_name}'s behavior or general cat care. "
@@ -300,6 +304,38 @@ def analyze_emotion():
 
     return jsonify({"error": "Something went wrong with the file upload"}), 500
 
+@app.route('/api/chat', methods=['POST'])
+def chat_with_gemini():
+    try:
+        data = request.get_json()
+        user_message = data.get("message", "")
+        pet_name = data.get("petName", "your cat")
+        pet_breed = data.get("petBreed", "a cat")
+        pet_emotion = data.get("emotion", "neutral")
+        confidence = data.get("confidence", "100%")
+
+        if not user_message.strip():
+            return jsonify({"error": "Message is empty"}), 400
+
+        prompt = (
+            f"You are an AI assistant specialized in cat emotions and behavior. "
+            f"A user is caring for a cat named {pet_name}, a {pet_breed}, currently showing {pet_emotion.lower()} emotion. "
+            f"The user asked: \"{user_message}\". "
+            f"{confidence}% is the confidence of the emotion analysis, use this information to your full advantage."
+            f"If {confidence} level is medium (<70%) or low (<40%), ask the user for further inquiries regarding their cat situation."
+            f"If user provides you with their current pet situation, use it to provide meaningful insights, advices, or helpful information."
+            f"Please respond with helpful, warm advice or information."
+        )
+
+        gemini_response = gemini_model.generate_content(prompt)
+        reply = gemini_response.text
+
+        return jsonify({"reply": reply})
+    
+    except Exception as e:
+        print(f"Gemini chat error: {e}")
+        return jsonify({"error": "Internal server error"}), 500
+
 @app.route('/')
 def index():
     return render_template('index.html')  # Serves the frontend entry page
@@ -311,5 +347,5 @@ def static_proxy(path):
 if __name__ == '__main__':
     # When running locally, Flask runs on http://127.0.0.1:5000 by default
     # debug=True allows for automatic reloading on code changes and provides debug info
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=5000, use_reloader=False)
 
