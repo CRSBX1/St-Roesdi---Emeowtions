@@ -188,7 +188,7 @@ def extract_yamnet_embeddings(waveform):
 
 analyzer = CatEmotionAnalyzer()
 
-with app.app_context:
+with app.app_context():
     analyzer.load_model(Model_path)
 
 # --- Define the API endpoint for emotion analysis ---
