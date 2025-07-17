@@ -268,7 +268,8 @@ def analyze_emotion():
                 f"You are an AI assistant specialized in cat behavior and emotions. "
                 f"A user has just uploaded an audio/video for their cat, {pet_name} ({pet_breed}), age {pet_age}. {pet_name} is described as{pet_description}"
                 f"The emotion analysis model has determined the primary emotion is '{final_analysis_result['emotions']['primary']}' "
-                f"with an accuracy estimation of {final_analysis_result['emotions']['confidence']:.2f}%. "
+                f"with an accuracy of {final_analysis_result['emotions']['confidence']*100}%. "
+                f"if confidence level is below 40% then model accuracy is low. if confidence level below 70% then model accuracy is medium. if confidence level is above 70% then model accuracy is high"
                 f"The recommendation is: '{final_analysis_result['analysis_details']['top_emotions'][0]['emotion']}'. " # Using primary emotion's recommendation
                 f"Based on this analysis, provide a helpful and welcoming initial message to the user. "
                 f"Encourage them to ask further questions about {pet_name}'s behavior or general cat care. "
