@@ -20,7 +20,7 @@ CORS(app)
 Model_path = 'cat_emotion_model.pkl'
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")# <<< IMPORTANT: Replace with your actual key
-genai.configure(api_key="AIzaSyAsza2Ba5lIlkZiA6Fc3BrIukQmh8rOYPU")
+genai.configure(api_key=GEMINI_API_KEY)
 gemini_model = genai.GenerativeModel('gemini-2.5-flash')
 
 class CatEmotionAnalyzer:
