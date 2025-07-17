@@ -2,7 +2,6 @@ services:
   - type: web
     name: cat-emotion-backend
     env: python
-    runtime: python
     buildCommand: pip install -r requirements.txt
     startCommand: python app.py
     pythonVersion: 3.10.13
