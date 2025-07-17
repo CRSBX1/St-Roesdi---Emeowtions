@@ -338,10 +338,11 @@ def chat_with_gemini():
         print(f"Gemini chat error: {e}")
         return jsonify({"error": "Internal server error"}), 500
 
+base_dir = os.path.dirname(os.path.abspath(__file__))
+app = Flask("Emeowtions_analyzer", template_folder=os.path.join(base_dir, "templates"))  # Serves the frontend entry page
+
 @app.route('/')
 def index():
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    app = Flask("Emeowtions_analyzer", template_folder=os.path.join(base_dir, "templates"))  # Serves the frontend entry page
     return render_template('index.html')
 
 @app.route('/<path:path>')
