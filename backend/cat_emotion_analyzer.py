@@ -340,7 +340,9 @@ def chat_with_gemini():
 
 @app.route('/')
 def index():
-    return render_template('index.html', template_folder=os.path.join(base_dir, "templates"))  # Serves the frontend entry page
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    app = Flask("Emeowtions_analyzer", template_folder=os.path.join(base_dir, "templates"))  # Serves the frontend entry page
+    return render_template('index.html')
 
 @app.route('/<path:path>')
 def static_proxy(path):
