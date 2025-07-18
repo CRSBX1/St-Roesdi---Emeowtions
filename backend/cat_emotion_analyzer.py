@@ -151,8 +151,12 @@ def analyze_emotion():
 
         prompt = (
             f"You are an AI assistant for cat owners. {pet_name}, a {pet_breed}, age {pet_age}, is described as {pet_desc}. "
-            f"The model detected the emotion '{result['emotions']['primary']}' with {result['emotions']['confidence']*100:.2f}%."
-            f"Keep your response concise and friendly. Act like the cat owners are your friend"
+            f"The cat emotion analysis model detected the emotion '{result['emotions']['primary']}' with {result['emotions']['confidence']*100:.2f}%."
+            f"The model analysis certainty is {result['analysis_details']['model_certainty']}"
+            f"Keep your response concise and friendly. Act like the cat owners are your friend."
+            f"If the model detected negative emotions(angry, fighting, defensive, warning), provide relevant advices in the response."
+            f"Encourage cat owners to further elaborate on their current situation through our implemented AI Assistant."
+            f"if the model confidence is low, urge cat owners for further inquiries through the chatbot."
         )
 
         try:
