@@ -13,6 +13,7 @@ import tensorflow_hub as hub
 import google.generativeai as genai
 import subprocess
 import tempfile
+import logging
 
 yamnet_model = hub.load('https://tfhub.dev/google/yamnet/1')
 base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -219,7 +220,7 @@ def analyze_emotion():
 
         try:
             file.save(temp_filepath)
-            print(f"File saved temporarily to: {temp_filepath}")
+            logging(f"File saved temporarily to: {temp_filepath}")
             if file_type == 'audio':
                 audio = load_audio(temp_filepath)
                 embedding = extract_yamnet_embeddings(audio)
@@ -251,12 +252,12 @@ def analyze_emotion():
                 return jsonify({"error": "Unsupported file type specified."}), 400
 
             # --- 3. Make a prediction using your loaded .pkl model ---
-            print("Making prediction with the model...")
+            logging("Making prediction with the model...")
             final_analysis_result = analyzer.predict_single_sample(embedding)
-            print(f"Printing analysis results:\n{final_analysis_result}")
+            logging(f"Printing analysis results:\n{final_analysis_result}")
             
             # --- Generate initial Chatbot response using Gemini API ---
-            print("Generating initial chatbot response using Gemini API...")
+            logging("Generating initial chatbot response using Gemini API...")
             pet_name = request.form.get('Pet.Name', 'your cat') # Assuming petName is sent from frontend
             pet_breed = request.form.get('Pet.Breed', 'a cat') # Assuming petBreed is sent from frontend
             pet_age = request.form.get('Pet.Age', 'age not known')
@@ -278,10 +279,12 @@ def analyze_emotion():
             )
 
             try:
+                logging("receiving message from gemini")
                 gemini_response = gemini_model.generate_content(chat_prompt)
+                logging("got message")
                 initial_chatbot_message = gemini_response.text
             except Exception as gemini_err:
-                print(f"Error calling Gemini API: {gemini_err}")
+                logging(f"Error calling Gemini API: {gemini_err}")
                 initial_chatbot_message = (
                     f"Hello! I've analyzed {pet_name}'s emotions. "
                     f"It seems {pet_name} is primarily feeling {final_analysis_result['emotions']['primary'].lower()} "
@@ -329,13 +332,15 @@ def chat_with_gemini():
             f"Please respond with helpful, warm advice or information."
         )
 
+        logging("Generating text")
         gemini_response = gemini_model.generate_content(prompt)
+        logging("text received")
         reply = gemini_response.text
 
         return jsonify({"reply": reply})
     
     except Exception as e:
-        print(f"Gemini chat error: {e}")
+        logging(f"Gemini chat error: {e}")
         return jsonify({"error": "Internal server error"}), 500
 
 @app.route('/')
