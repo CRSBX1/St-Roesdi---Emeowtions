@@ -17,6 +17,11 @@ model_path = os.path.join(base_dir, 'cat_emotion_model.pkl')
 app = Flask("Emeowtions_analyzer", template_folder=os.path.join(base_dir, "templates"), static_folder=os.path.join(base_dir, "static"))
 CORS(app)
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+)
+
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 genai.configure(api_key=GEMINI_API_KEY)
 gemini_model = genai.GenerativeModel('gemini-2.5-flash')
