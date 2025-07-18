@@ -71,7 +71,7 @@ class CatEmotionAnalyzer:
                 }
             },
             "analysis_details": {
-                "model_certainty": "high" if confidence > 0.8 else "medium" if confidence > 0.6 else "low",
+                "model_certainty": "high" if confidence > 0.8 else "medium" if confidence > 0.4 else "low",
                 "top_emotions": self._get_top_emotions(probabilities, 3),
                 "confidence_distribution": {
                     "mean": float(np.mean(probabilities)),
