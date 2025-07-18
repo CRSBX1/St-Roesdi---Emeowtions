@@ -126,6 +126,7 @@ def analyze_emotion():
     try:
         file.save(temp_path)
         logging.info(f"Saved file to {temp_path}")
+        logging.info(file_type)
 
         if file_type == 'audio':
             waveform = load_audio(temp_path)
