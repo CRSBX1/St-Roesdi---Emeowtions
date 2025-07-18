@@ -152,7 +152,7 @@ def analyze_emotion():
         prompt = (
             f"You are an AI assistant for cat owners. {pet_name}, a {pet_breed}, age {pet_age}, is described as {pet_desc}. "
             f"The model detected the emotion '{result['emotions']['primary']}' with {result['emotions']['confidence']*100:.2f}%."
-            f"Keep your response concise and to the point."
+            f"Keep your response concise and friendly. Act like the cat owners are your friend"
         )
 
         try:
