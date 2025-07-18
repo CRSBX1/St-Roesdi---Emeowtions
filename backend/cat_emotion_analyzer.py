@@ -11,7 +11,10 @@ import gc
 from flask import Flask, jsonify, request, send_from_directory, render_template
 from flask_cors import CORS
 import google.generativeai as genai
-import soundfile
+import soundfile as sf
+import tensorflow as tf
+import tensorflow_hub as hub
+import librosa
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 model_path = os.path.join(base_dir, 'cat_emotion_model.pkl')
@@ -98,16 +101,12 @@ with app.app_context():
     analyzer.load_model(model_path)
 
 def load_audio(file_path, target_sr=16000):
-    import soundfile as sf
-    import librosa
     audio, sr = sf.read(file_path)
     if sr != target_sr:
         audio = librosa.resample(audio, orig_sr=sr, target_sr=target_sr)
     return audio
 
 def extract_yamnet_embeddings(waveform):
-    import tensorflow as tf
-    import tensorflow_hub as hub
     yamnet_model = hub.load('https://tfhub.dev/google/yamnet/1')
     scores, embeddings, _ = yamnet_model(waveform)
     return tf.reduce_mean(embeddings, axis=0).numpy()
