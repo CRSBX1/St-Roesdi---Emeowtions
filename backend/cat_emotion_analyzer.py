@@ -1,4 +1,3 @@
-import json
 import numpy as np
 from datetime import datetime
 import joblib
@@ -11,7 +10,6 @@ import gc
 from flask import Flask, jsonify, request, send_from_directory, render_template
 from flask_cors import CORS
 import google.generativeai as genai
-import soundfile as sf
 import tensorflow as tf
 import tensorflow_hub as hub
 import librosa
@@ -101,10 +99,8 @@ with app.app_context():
     analyzer.load_model(model_path)
 
 def load_audio(file_path, target_sr=16000):
-    audio, sr = sf.read(file_path)
-    if sr != target_sr:
-        audio = librosa.resample(audio, orig_sr=sr, target_sr=target_sr)
-    return audio
+    waveform, sr = librosa.load(file_path, sr=target_sr)
+    return waveform
 
 def extract_yamnet_embeddings(waveform):
     yamnet_model = hub.load('https://tfhub.dev/google/yamnet/1')
@@ -154,8 +150,9 @@ def analyze_emotion():
         pet_desc = request.form.get('Pet.description?', '')
 
         prompt = (
-            f"You are an AI assistant for cats. {pet_name}, a {pet_breed}, age {pet_age}, is described as {pet_desc}. "
+            f"You are an AI assistant for cat owners. {pet_name}, a {pet_breed}, age {pet_age}, is described as {pet_desc}. "
             f"The model detected the emotion '{result['emotions']['primary']}' with {result['emotions']['confidence']*100:.2f}%."
+            f"Keep your response concise and to the point."
         )
 
         try:
@@ -195,7 +192,8 @@ def chat_with_gemini():
 
         prompt = (
             f"User owns {pet_name} the {pet_breed}, who is {pet_emotion} with confidence {confidence}. "
-            f"User asked: '{user_message}'. Respond with friendly, helpful advice."
+            f"User asked: '{user_message}'. Respond friendly and provide assistance to the owner."
+            f"Provide advice or instructions if required"
         )
 
         gemini_response = gemini_model.generate_content(prompt)

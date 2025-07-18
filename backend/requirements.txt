@@ -6,4 +6,3 @@ librosa
 tensorflow
 tensorflow_hub
 google.generativeai
-soundfile
