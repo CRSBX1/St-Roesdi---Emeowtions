@@ -17,7 +17,7 @@ is accessible through the link included in this repository. The emotion analysis
 needs to load resources it needs to execute the analysis process.
 
 **Note: Emeowtion's source code files don't include GEMINI API Keys for security reasons, therefore please use your own API key
-if you want to use our application's AI Assistant feature.**
+if you want to use our application's AI Assistant feature locally.**
 
 ## Requirements
 * Python Version 3.10.13 (Highly recommend to use virtual environments such as .conda and .venv)
